@@ -1,0 +1,55 @@
+type Lembur {
+    id: ID!
+    users_profile_id: ID!
+    proyek_id: ID!
+    tanggal: Date
+    created_at: DateTime
+    updated_at: DateTime
+    deleted_at: DateTime
+
+    userProfile: UserProfile @belongsTo
+    proyek: Proyek @belongsTo
+}
+
+input CreateLemburInput {
+    users_profile_id: ID!
+    proyek_id: ID!
+    tanggal: Date!
+}
+
+input UpdateLemburInput {
+    tanggal: Date
+}
+
+extend type Query {
+    allLembur: [Lembur!]!
+    @all(model: "App\\Models\\Lembur\\Lembur")
+
+    lembur(id: ID! @eq) : Lembur
+    @find(model: "App\\Models\\Lembur\\Lembur")
+
+    lemburByTanggal(tanggal: Date! @where(key: "tanggal")): [Lembur!]!
+    @all(model: "App\\Models\\Lembur\\Lembur")
+}
+
+extend type Mutation {
+    # tambah data
+    createLembur(input: CreateLemburInput! @spread): Lembur
+    @create(model: "App\\Models\\Lembur\\Lembur")
+
+    # ubah data
+    updateLembur(
+        id: ID! @eq,
+        input: UpdateLemburInput! @spread
+        ): Lembur
+    @update(model: "App\\Models\\Lembur\\Lembur")
+
+    deleteLembur(id: ID! @eq): Lembur
+    @delete(model: "App\\Models\\Lembur\\Lembur")
+
+    restoreLembur(id: ID!): Lembur
+    @field(resolver: "App\\GraphQL\\Lembur\\Mutations\\LemburMutation@restore")
+
+    forceDeleteLembur(id: ID!): Lembur
+    @field(resolver: "App\\GraphQL\\Lembur\\Mutations\\LemburMutation@forceDelete")
+}
